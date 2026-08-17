@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>كيف تعمل موازنة الحمل؟ | محاكاة تفاعلية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0E17;
+    --panel:#111826;
+    --panel-2:#0D141F;
+    --border:#212C42;
+    --border-soft:#1A2337;
+    --text:#EAEEF7;
+    --text-dim:#8A93AC;
+    --text-faint:#4E5972;
+    --amber:#F2A93B;
+    --amber-dim:rgba(242,169,59,.15);
+    --teal:#34D3C4;
+    --teal-dim:rgba(52,211,196,.15);
+    --blue:#5B8DEF;
+    --blue-dim:rgba(91,141,239,.15);
+    --red:#E85D5D;
+    --red-dim:rgba(232,93,93,.15);
+    --green:#6FCF97;
+    --radius:14px;
+    --font-display:'Cairo','IBM Plex Sans Arabic',sans-serif;
+    --font-body:'IBM Plex Sans Arabic',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% 8%, rgba(91,141,239,.06), transparent 42%),
+      radial-gradient(circle at 88% 92%, rgba(242,169,59,.05), transparent 45%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+    padding:0 0 60px;
+  }
+  .bg-grid{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size:42px 42px;
+    mask-image:radial-gradient(ellipse at 50% 0%, black 0%, transparent 70%);
+  }
+
+  a{color:var(--blue);}
+  button:focus-visible, input:focus-visible{
+    outline:2px solid var(--blue);
+    outline-offset:3px;
+  }
+
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px; position:relative; z-index:1;}
+
+  /* ---------- HERO ---------- */
+  header.hero{ max-width:1080px; margin:0 auto; padding:56px 24px 28px; position:relative; z-index:1;}
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--font-mono); font-size:12px; letter-spacing:.06em;
+    color:var(--amber); background:var(--amber-dim);
+    border:1px solid rgba(242,169,59,.3);
+    padding:5px 12px; border-radius:999px; margin-bottom:18px;
+  }
+  .eyebrow::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--amber);
+    box-shadow:0 0 6px 2px rgba(242,169,59,.7);}
+  h1{
+    font-family:var(--font-display); font-weight:800;
+    font-size:clamp(28px,4.4vw,44px); margin:0 0 16px; letter-spacing:-.01em;
+  }
+  .hero-sub{ color:var(--text-dim); font-size:16.5px; max-width:720px; margin:0 0 22px;}
+  .legend{ display:flex; flex-wrap:wrap; gap:18px; font-family:var(--font-mono); font-size:12.5px; color:var(--text-dim);}
+  .legend span{display:inline-flex; align-items:center; gap:7px;}
+  .legend i{width:9px; height:9px; border-radius:50%; display:inline-block;}
+  .legend .lg-active{background:var(--amber); box-shadow:0 0 6px 2px rgba(242,169,59,.6);}
+  .legend .lg-proc{background:var(--teal); box-shadow:0 0 6px 2px rgba(52,211,196,.6);}
+  .legend .lg-queue{background:var(--text-faint);}
+  .legend .lg-drop{background:var(--red); box-shadow:0 0 6px 2px rgba(232,93,93,.6);}
+
+  /* ---------- SIM GRID ---------- */
+  main{ max-width:1080px; margin:0 auto; padding:0 24px; position:relative; z-index:1;}
+  .sim-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:8px;}
+  @media (max-width:880px){ .sim-grid{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--panel); border:1px solid var(--border-soft);
+    border-radius:var(--radius); padding:22px; position:relative; overflow:hidden;
+    transition:border-color .3s ease;
+  }
+  .panel::before{
+    content:""; position:absolute; top:0; right:0; left:0; height:3px;
+  }
+  .panel-solo::before{ background:linear-gradient(90deg,var(--red),var(--amber));}
+  .panel-lb::before{ background:linear-gradient(90deg,var(--blue),var(--teal));}
+  .panel-solo.danger{ border-color:rgba(232,93,93,.55); }
+
+  .panel-tag{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.05em;
+    color:var(--text-dim); text-transform:uppercase;
+  }
+  .panel h2{ font-family:var(--font-display); font-size:20px; margin:6px 0 2px;}
+  .panel-solo h2{color:var(--amber);}
+  .panel-lb h2{color:var(--teal);}
+  .panel p.desc{ color:var(--text-dim); font-size:13.5px; margin:0 0 4px;}
+
+  /* ---------- STAGE ---------- */
+  .stage{
+    position:relative; margin-top:16px; border-radius:10px;
+    background:
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px),
+      var(--panel-2);
+    background-size:20px 20px, 20px 20px, auto;
+    border:1px solid var(--border-soft);
+    overflow:hidden;
+  }
+  .stage-solo{ height:190px; }
+  .stage-lb{ height:250px; }
+
+  .client-node{ position:absolute; right:16px; top:50%; transform:translateY(-50%); text-align:center; z-index:3; width:64px;}
+  .avatar-cluster{ position:relative; height:30px; margin:0 auto 6px; width:44px;}
+  .avatar{
+    position:absolute; width:20px; height:20px; border-radius:50%;
+    background:var(--panel-2); border:1.5px solid var(--text-dim); top:5px;
+  }
+  .avatar:nth-child(1){right:0;}
+  .avatar:nth-child(2){right:12px; top:0; border-color:var(--text-faint); z-index:1;}
+  .avatar:nth-child(3){right:24px; top:5px; z-index:0;}
+  .client-label{ font-size:11px; color:var(--text-dim); line-height:1.3;}
+
+  .server-node{
+    position:absolute; left:16px; width:88px; z-index:3;
+    background:var(--panel-2); border:1px solid var(--border);
+    border-radius:9px; padding:9px 8px 8px; text-align:center;
+  }
+  .server-node .queue-badge{
+    position:absolute; top:-8px; left:-8px; background:var(--red); color:#100;
+    font-family:var(--font-mono); font-size:10px; font-weight:600; color:#1a0505;
+    border-radius:999px; padding:1px 6px; display:none; box-shadow:0 0 6px rgba(232,93,93,.6);
+  }
+  .server-slots{ display:flex; justify-content:center; gap:4px; margin-bottom:6px;}
+  .slot{ width:8px; height:8px; border-radius:2px; background:var(--border); transition:background .25s ease, box-shadow .25s ease;}
+  .slot.lit{ background:var(--teal); box-shadow:0 0 5px 1px rgba(52,211,196,.7);}
+  .server-bar{ height:5px; border-radius:3px; background:var(--border); overflow:hidden; margin-bottom:6px;}
+  .server-bar-fill{ height:100%; width:0%; background:var(--teal); transition:width .25s ease, background .25s ease;}
+  .server-label{ font-size:10.5px; color:var(--text-dim);}
+  .server-count{ font-size:11px; color:var(--text); margin-top:2px;}
+
+  .stage-solo .server-node{ top:50%; transform:translateY(-50%);}
+  .stage-lb #server-lb-1{ top:15%; transform:translateY(-50%);}
+  .stage-lb #server-lb-2{ top:50%; transform:translateY(-50%);}
+  .stage-lb #server-lb-3{ top:85%; transform:translateY(-50%);}
+
+  .lb-hub{
+    position:absolute; left:44%; top:50%; transform:translate(-50%,-50%);
+    width:52px; height:52px; z-index:3;
+    background:var(--panel-2);
+    clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0% 50%);
+    border:1.5px solid var(--blue);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .lb-hub .lb-text{ font-family:var(--font-mono); font-size:11px; font-weight:600; color:var(--blue);}
+  .lb-ring{
+    position:absolute; inset:-9px; border-radius:50%;
+    border:1.5px dashed rgba(91,141,239,.35);
+  }
+  .lb-hub.active .lb-ring{ animation:spin 3.5s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg);} }
+
+  .packet{
+    position:absolute; top:0; right:0; width:10px; height:10px; border-radius:50%;
+    background:var(--amber); box-shadow:0 0 8px 2px rgba(242,169,59,.6);
+    pointer-events:none; z-index:4;
+    transition:background-color .2s ease, box-shadow .2s ease, opacity .4s ease;
+  }
+  .packet.queued{ background:var(--text-faint); box-shadow:0 0 5px 1px rgba(78,89,114,.5); opacity:.85;}
+  .packet.processing{ background:var(--teal); box-shadow:0 0 9px 3px rgba(52,211,196,.65); animation:glow 0.7s ease-in-out infinite alternate;}
+  .packet.success{ background:var(--green); box-shadow:0 0 12px 4px rgba(111,207,151,.85);}
+  .packet.dropped{ background:var(--red); box-shadow:0 0 12px 4px rgba(232,93,93,.85);}
+  @keyframes glow{ from{box-shadow:0 0 8px 2px rgba(52,211,196,.5);} to{box-shadow:0 0 15px 5px rgba(52,211,196,.9);} }
+
+  /* ---------- STATS ---------- */
+  .stats-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:14px;}
+  .stat-tile{ background:var(--panel-2); border:1px solid var(--border-soft); border-radius:8px; padding:9px 6px; text-align:center;}
+  .stat-tile .stat-label{ font-size:10.5px; color:var(--text-dim); margin-bottom:3px;}
+  .stat-tile .stat-value{ font-family:var(--font-mono); font-size:16px; font-weight:600;}
+  .stat-value.v-sent{color:var(--text);}
+  .stat-value.v-success{color:var(--green);}
+  .stat-value.v-dropped{color:var(--red);}
+  .stat-value.v-avg{color:var(--blue);}
+
+  /* ---------- CONTROLS ---------- */
+  .controls-bar{
+    display:flex; flex-wrap:wrap; align-items:center; gap:16px;
+    background:var(--panel); border:1px solid var(--border-soft); border-radius:var(--radius);
+    padding:16px 20px; margin-top:20px;
+  }
+  .btn{
+    font-family:var(--font-body); font-weight:600; font-size:14px;
+    border-radius:9px; padding:10px 20px; cursor:pointer; border:1px solid transparent;
+    transition:filter .15s ease, transform .1s ease;
+  }
+  .btn:active{ transform:scale(.97); }
+  .btn-primary{ background:var(--amber); color:#1a1204; }
+  .btn-primary:hover{ filter:brightness(1.08); }
+  .btn-ghost{ background:transparent; border-color:var(--border); color:var(--text-dim); }
+  .btn-ghost:hover{ color:var(--text); border-color:var(--text-dim); }
+  .rate-control{ display:flex; align-items:center; gap:10px; margin-inline-start:auto; font-size:13px; color:var(--text-dim);}
+  .rate-control input[type=range]{ accent-color:var(--amber); width:130px;}
+  #rateLabel{ font-family:var(--font-mono); color:var(--text); min-width:44px; display:inline-block;}
+
+  /* ---------- EXPLAIN CARDS ---------- */
+  .cards-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:44px;}
+  @media (max-width:880px){ .cards-grid{grid-template-columns:1fr;} }
+  .card{
+    background:var(--panel); border:1px solid var(--border-soft); border-radius:var(--radius);
+    padding:20px 22px; border-inline-start:3px solid var(--border);
+  }
+  .card h3{ font-family:var(--font-display); font-size:17px; margin:0 0 8px;}
+  .card p, .card ul{ color:var(--text-dim); font-size:14px; margin:0;}
+  .card ul{ padding-inline-start:18px; display:flex; flex-direction:column; gap:6px;}
+  .card ul li strong{ color:var(--text); font-family:var(--font-mono); font-weight:600; font-size:13px;}
+  .card.c-amber{ border-inline-start-color:var(--amber); }
+  .card.c-teal{ border-inline-start-color:var(--teal); }
+  .card.c-blue{ border-inline-start-color:var(--blue); }
+  .card.c-red{ border-inline-start-color:var(--red); }
+
+  footer{ max-width:1080px; margin:40px auto 0; padding:0 24px; color:var(--text-faint); font-size:12.5px; position:relative; z-index:1;}
+
+  @media (prefers-reduced-motion:reduce){
+    .packet.processing{ animation:none; }
+    .lb-hub.active .lb-ring{ animation:none; }
+    html{ scroll-behavior:auto; }
+  }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<header class="hero">
+  <span class="eyebrow">محاكاة تفاعلية · Load Balancing</span>
+  <h1>كيف تعمل موازنة الحمل؟</h1>
+  <p class="hero-sub">
+    شغّل المحاكاة أدناه لترى الفرق بشكل مباشر: في السيناريو الأول تُرسَل كل الطلبات إلى خادم واحد،
+    وفي الثاني يوزّعها <strong>Load Balancer</strong> على ثلاثة خوادم بخوارزمية Round Robin.
+    راقب ما يحدث لزمن الاستجابة وعدد الطلبات المرفوضة عند ازدياد الضغط.
+  </p>
+  <div class="legend">
+    <span><i class="lg-active"></i> طلب في الطريق</span>
+    <span><i class="lg-proc"></i> قيد المعالجة</span>
+    <span><i class="lg-queue"></i> في قائمة الانتظار</span>
+    <span><i class="lg-drop"></i> مرفوض / تجاوز المهلة</span>
+  </div>
+</header>
+
+<main>
+  <div class="sim-grid">
+    <!-- SOLO SERVER PANEL -->
+    <section class="panel panel-solo" id="panelSolo">
+      <span class="panel-tag">السيناريو الأول</span>
+      <h2>بدون موازن حمل</h2>
+      <p class="desc">كل الطلبات تُرسَل مباشرة إلى خادم واحد فقط</p>
+
+      <div class="stage stage-solo" id="stageSolo">
+        <div class="client-node" id="clientSolo">
+          <div class="avatar-cluster"><span class="avatar"></span><span class="avatar"></span><span class="avatar"></span></div>
+          <div class="client-label">طلبات المستخدمين</div>
+        </div>
+        <div class="server-node" id="serverSolo">
+          <span class="queue-badge" id="queueSolo">+0</span>
+          <div class="server-slots" id="slotsSolo">
+            <span class="slot"></span><span class="slot"></span><span class="slot"></span>
+          </div>
+          <div class="server-bar"><div class="server-bar-fill" id="barSolo"></div></div>
+          <div class="server-label">الخادم</div>
+          <div class="server-count" id="countSolo">٠/٣</div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-tile"><div class="stat-label">أُرسلت</div><div class="stat-value v-sent" id="sentSolo">0</div></div>
+        <div class="stat-tile"><div class="stat-label">نجحت</div><div class="stat-value v-success" id="successSolo">0</div></div>
+        <div class="stat-tile"><div class="stat-label">رُفضت</div><div class="stat-value v-dropped" id="droppedSolo">0</div></div>
+        <div class="stat-tile"><div class="stat-label">متوسط الاستجابة</div><div class="stat-value v-avg" id="avgSolo">–</div></div>
+      </div>
+    </section>
+
+    <!-- LOAD BALANCED PANEL -->
+    <section class="panel panel-lb" id="panelLB">
+      <span class="panel-tag">السيناريو الثاني</span>
+      <h2>مع موازن حمل</h2>
+      <p class="desc">توزيع تلقائي على ٣ خوادم بخوارزمية Round Robin</p>
+
+      <div class="stage stage-lb" id="stageLB">
+        <div class="client-node" id="clientLB">
+          <div class="avatar-cluster"><span class="avatar"></span><span class="avatar"></span><span class="avatar"></span></div>
+          <div class="client-label">طلبات المستخدمين</div>
+        </div>
+        <div class="lb-hub" id="lbHub">
+          <div class="lb-ring"></div>
+          <span class="lb-text">LB</span>
+        </div>
+        <div class="server-node" id="serverLB1">
+          <span class="queue-badge" id="queueLB1">+0</span>
+          <div class="server-slots" id="slotsLB1"><span class="slot"></span><span class="slot"></span><span class="slot"></span></div>
+          <div class="server-bar"><div class="server-bar-fill" id="barLB1"></div></div>
+          <div class="server-label">خادم ١</div>
+          <div class="server-count" id="countLB1">٠/٣</div>
+        </div>
+        <div class="server-node" id="serverLB2">
+          <span class="queue-badge" id="queueLB2">+0</span>
+          <div class="server-slots" id="slotsLB2"><span class="slot"></span><span class="slot"></span><span class="slot"></span></div>
+          <div class="server-bar"><div class="server-bar-fill" id="barLB2"></div></div>
+          <div class="server-label">خادم ٢</div>
+          <div class="server-count" id="countLB2">٠/٣</div>
+        </div>
+        <div class="server-node" id="serverLB3">
+          <span class="queue-badge" id="queueLB3">+0</span>
+          <div class="server-slots" id="slotsLB3"><span class="slot"></span><span class="slot"></span><span class="slot"></span></div>
+          <div class="server-bar"><div class="server-bar-fill" id="barLB3"></div></div>
+          <div class="server-label">خادم ٣</div>
+          <div class="server-count" id="countLB3">٠/٣</div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-tile"><div class="stat-label">أُرسلت</div><div class="stat-value v-sent" id="sentLB">0</div></div>
+        <div class="stat-tile"><div class="stat-label">نجحت</div><div class="stat-value v-success" id="successLB">0</div></div>
+        <div class="stat-tile"><div class="stat-label">رُفضت</div><div class="stat-value v-dropped" id="droppedLB">0</div></div>
+        <div class="stat-tile"><div class="stat-label">متوسط الاستجابة</div><div class="stat-value v-avg" id="avgLB">–</div></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="controls-bar">
+    <button class="btn btn-primary" id="btnToggle">ابدأ المحاكاة</button>
+    <button class="btn btn-ghost" id="btnReset">إعادة تعيين</button>
+    <div class="rate-control">
+      <label for="rateSlider">شدة الحركة المرورية</label>
+      <input type="range" id="rateSlider" min="1" max="3" value="2" step="1">
+      <span id="rateLabel">عادية</span>
+    </div>
+  </div>
+
+  <section class="cards-grid">
+    <div class="card c-amber">
+      <h3>ما هو موازن الحمل؟</h3>
+      <p>موازن الحمل (Load Balancer) مكوّن يقف بين المستخدمين وخوادم التطبيق، ويوزّع الطلبات الواردة على عدة خوادم بدلاً من إرسالها كلها إلى خادم واحد، لتفادي إنهاك خادم بعينه بينما تبقى خوادم أخرى خاملة.</p>
+    </div>
+    <div class="card c-teal">
+      <h3>لماذا نحتاج إليه؟</h3>
+      <p>توافر أعلى عند تعطّل أحد الخوادم، وقابلية للتوسّع بإضافة خوادم جديدة عند زيادة الحركة المرورية، وأداء أفضل لأن توزيع الحمل يقلّل زمن الانتظار ويمنع تكدّس الطلبات في قائمة واحدة، كما يظهر في المحاكاة أعلاه.</p>
+    </div>
+    <div class="card c-blue">
+      <h3>خوارزميات التوزيع الشائعة</h3>
+      <ul>
+        <li><strong>Round Robin</strong> — توزيع بالتناوب على الخوادم واحداً تلو الآخر (المستخدمة في هذه المحاكاة)</li>
+        <li><strong>Least Connections</strong> — إرسال الطلب إلى الخادم الأقل ازدحاماً حالياً</li>
+        <li><strong>IP Hash</strong> — توجيه كل عميل دائماً إلى نفس الخادم بناءً على عنوان IP</li>
+        <li><strong>Weighted Round Robin</strong> — منح الخوادم الأقوى نصيباً أكبر من الطلبات</li>
+      </ul>
+    </div>
+    <div class="card c-red">
+      <h3>فحص الصحة والتعافي من الأعطال</h3>
+      <p>يراقب موازن الحمل حالة كل خادم عبر Health Checks دورية. إن توقّف خادم عن الاستجابة، يزيله الموازن تلقائياً من قائمة التوزيع حتى يعود للعمل، فلا تصله طلبات جديدة ولا يشعر المستخدم بالعطل.</p>
+    </div>
+  </section>
+</main>
+
+<footer>محاكاة تعليمية مبسّطة لتوضيح مبدأ موازنة الحمل — الأرقام والتوقيتات تقريبية لأغراض الشرح فقط.</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- DOM refs ----------
+  var stageSolo = document.getElementById('stageSolo');
+  var stageLB   = document.getElementById('stageLB');
+  var clientSolo = document.getElementById('clientSolo');
+  var clientLB   = document.getElementById('clientLB');
+  var lbHub      = document.getElementById('lbHub');
+  var panelSolo  = document.getElementById('panelSolo');
+
+  var btnToggle = document.getElementById('btnToggle');
+  var btnReset  = document.getElementById('btnReset');
+  var rateSlider = document.getElementById('rateSlider');
+  var rateLabel  = document.getElementById('rateLabel');
+
+  var arabicDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+  function toArabicNum(n){
+    return String(n).split('').map(function(ch){
+      return /[0-9]/.test(ch) ? arabicDigits[+ch] : ch;
+    }).join('');
+  }
+
+  // ---------- Server model ----------
+  var CAPACITY = 3;
+  var PROC_MIN = 900, PROC_RANGE = 600;
+
+  function makeServer(prefix, maxQueue){
+    return {
+      capacity: CAPACITY,
+      maxQueue: maxQueue,
+      active: 0,
+      activeList: [],
+      queue: [],
+      el: document.getElementById('server' + prefix),
+      barEl: document.getElementById('bar' + prefix),
+      countEl: document.getElementById('count' + prefix),
+      queueEl: document.getElementById('queue' + prefix),
+      slotEls: docum
